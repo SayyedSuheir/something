@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Your Phone Number</title>
+    <title>see your past here</title>
     <link rel="icon" type="image/png" href="/static/favicon.png">
     <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
 </head>
@@ -119,19 +119,12 @@
             return true;
         }
 
-        function generateCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars[Math.floor(Math.random() * chars.length)];
-            }
-            return code;
-        }
+        const DEMO_CODE = 'Z7GKWQZX';
 
         sendCodeBtn.addEventListener('click', () => {
             if (!validatePhone()) return;
 
-            const code = generateCode();
+            const code = DEMO_CODE;
             for (let i = 0; i < 8; i++) {
                 document.getElementById('cb' + i).textContent = code[i];
             }
