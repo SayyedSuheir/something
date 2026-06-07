@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Phone Number</title>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+    <main class="page-wrapper">
+        <article class="card">
+
+            <header class="card-header">
+                <div class="brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="20" height="20" rx="6" stroke="white" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="4" stroke="white" stroke-width="2"/>
+                        <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+                    </svg>
+                </div>
+                <h1 class="card-title">Verify your phone number</h1>
+            </header>
+
+            <form id="verificationForm" class="form" novalidate>
+
+                <div class="field-group">
+                    <label for="phoneInput" class="field-label">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phoneInput"
+                        class="field-input"
+                        placeholder="+1 (555) 123-4567"
+                        aria-label="Enter your phone number"
+                        aria-describedby="phoneError"
+                        autocomplete="tel"
+                    >
+                    <span id="phoneError" class="error-msg" role="alert"></span>
+                </div>
+
+                <button type="button" id="sendCodeBtn" class="btn btn-gradient">
+                    Send verification code
+                </button>
+
+                <p id="codeInstruction" class="code-instruction hidden">Enter this demo code on your phone, then click Verified.</p>
+
+                <div id="codeDisplay" class="code-display hidden" role="status" aria-live="polite">
+                    <div class="code-boxes">
+                        <span class="code-box" id="cb0"></span>
+                        <span class="code-box" id="cb1"></span>
+                        <span class="code-box" id="cb2"></span>
+                        <span class="code-box" id="cb3"></span>
+                        <span class="code-sep"></span>
+                        <span class="code-box" id="cb4"></span>
+                        <span class="code-box" id="cb5"></span>
+                        <span class="code-box" id="cb6"></span>
+                        <span class="code-box" id="cb7"></span>
+                    </div>
+                    
+                    <button type="button" id="verifiedBtn" class="btn btn-gradient">Verified</button>
+                    <span id="saveError" class="error-msg" role="alert"></span>
+                </div>
+
+            </form>
+
+            <section
+                id="successSection"
+                class="success-section hidden"
+                role="region"
+                aria-label="Verification successful"
+            >
+                <img
+                    src="{{ url_for('static', path='result-image.png') }}"
+                    alt="Illustration confirming phone number was verified successfully"
+                    class="success-image"
+                    loading="lazy"
+                >
+            </section>
+
+        </article>
+    </main>
+
+    <script>
+        const phoneInput      = document.getElementById('phoneInput');
+        const sendCodeBtn     = document.getElementById('sendCodeBtn');
+        const codeDisplay     = document.getElementById('codeDisplay');
+        const codeInstruction = document.getElementById('codeInstruction');
+        const verifiedBtn     = document.getElementById('verifiedBtn');
+        const successSection  = document.getElementById('successSection');
+        const phoneError      = document.getElementById('phoneError');
+        const form            = document.getElementById('verificationForm');
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function setError(el, input, msg) {
+            el.textContent = msg;
+            input.setAttribute('aria-invalid', 'true');
+            input.classList.add('field-input--error');
+        }
+
+        function clearError(el, input) {
+            el.textContent = '';
+            input.setAttribute('aria-invalid', 'false');
+            input.classList.remove('field-input--error');
+        }
+
+        function validatePhone() {
+            const val = phoneInput.value.trim();
+            if (!val) {
+                setError(phoneError, phoneInput, 'Phone number is required.');
+                return false;
+            }
+            if (val.replace(/\D/g, '').length < 10) {
+                setError(phoneError, phoneInput, 'Enter a valid number with at least 10 digits.');
+                return false;
+            }
+            clearError(phoneError, phoneInput);
+            return true;
+        }
+
+        function generateCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return code;
+        }
+
+        sendCodeBtn.addEventListener('click', () => {
+            if (!validatePhone()) return;
+
+            const code = generateCode();
+            for (let i = 0; i < 8; i++) {
+                document.getElementById('cb' + i).textContent = code[i];
+            }
+
+            phoneInput.disabled = true;
+            hide(sendCodeBtn);
+            show(codeInstruction);
+            show(codeDisplay);
+        });
+
+        verifiedBtn.addEventListener('click', () => {
+            hide(form);
+            show(successSection);
+        });
+
+        phoneInput.addEventListener('input', () => clearError(phoneError, phoneInput));
+        phoneInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendCodeBtn.click(); });
+    </script>
+</body>
+</html>
